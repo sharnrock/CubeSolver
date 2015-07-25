@@ -23,63 +23,110 @@ RCube::RCube(QObject *parent) : QObject(parent)
 // Cube Movements
 // ==============
 
+/* FACE ORIENTATION GUIDE
+ *
+ * The origin faces for the cube are oriented as follows...
+ * (bottom edge of this face meets ->) : (Adjacent face)
+ * SO Top:Front MEANS means if you're looking at the Top face, the bottom edge will be the Front face
+ * the top edge would be the Back face, the left edge would be the Left face and right edge would be Right face
+ *
+ * Front:Bottom
+ * Top:Front
+ * Right:Front
+ * Left:Front
+ * Bottom:Front
+ * Back:Bottom
+ *
+ * This information is very important.  If you don't understand why yet, you will.
+ *
+ * Inside of the functions there is a little helper too that goes...
+ * Adjacent Face Name : Edge Of That Face That Needs To Rotate
+ * Face:edge   Capstart;lowercase
+ */
+
 void RCube::frontCCW()
 {
     faces[Front].rotateCCW();
-}
 
+    // Adjacents include:
+    // Top:bottom; Bottom:bottom; Left:bottom; Right:bottom
+    Color adj1[CUBE_DIMENSION] ;
+}
 void RCube::frontCW()
 {
     faces[Front].rotateCW();
+
+    // Adjacents include:
+    // Top:bottom; Bottom:bottom; Left:bottom; Right:bottom
 }
 
 void RCube::backCCW()
 {
     faces[Back].rotateCCW();
+    // Adjacents include:
+    // Top:top; Bottom:top; Left:top; Right:top
 }
 
 void RCube::backCW()
 {
     faces[Back].rotateCW();
+    // Adjacents include:
+    // Top:top; Bottom:top; Left:top; Right:top
 }
 
 void RCube::leftCCW()
 {
     faces[Left].rotateCCW();
+    // Adjacents include:
+    // Top:left; Bottom:right; Back:right; Front:left
 }
 
 void RCube::leftCW()
 {
     faces[Left].rotateCW();
+    // Adjacents include:
+    // Top:left; Bottom:right; Back:right; Front:left
 }
 void RCube::rightCCW()
 {
     faces[Right].rotateCCW();
+    // Adjacents include:
+    // Top:right; Bottom:left; Back:left; Front:right
 }
 
 void RCube::rightCW()
 {
     faces[Right].rotateCW();
+    // Adjacents include:
+    // Top:right; Bottom:left; Back:left; Front:right
 }
 
 void RCube::topCCW()
 {
     faces[Top].rotateCCW();
+    // Adjacents include:
+    // Left:right; Right:left; Back:top; Front:top
 }
 
 void RCube::topCW()
 {
     faces[Top].rotateCW();
+    // Adjacents include:
+    // Left:right; Right:left; Back:top; Front:top
 }
 
 void RCube::bottomCCW()
 {
     faces[Bottom].rotateCCW();
+    // Adjacents include:
+    // Left:left; Right:right; Back:bottom; Front:bottom
 }
 
 void RCube::bottomCW()
 {
     faces[Bottom].rotateCW();
+    // Adjacents include:
+    // Left:left; Right:right; Back:bottom; Front:bottom
 }
 
 

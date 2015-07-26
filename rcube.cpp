@@ -5,7 +5,8 @@
 
 // Use random colors while constructing the faces
 //  for testing the cube's movements...
-#define RANDOM_COLOR
+
+//#define RANDOM_COLOR
 #ifdef RANDOM_COLOR
 #include <stdlib.h>
 #endif
@@ -29,6 +30,9 @@ RCube::RCube(QObject *parent) : QObject(parent)
  * (bottom edge of this face meets ->) : (Adjacent face)
  * SO Top:Front MEANS means if you're looking at the Top face, the bottom edge will be the Front face
  * the top edge would be the Back face, the left edge would be the Left face and right edge would be Right face
+ * Square[0][0] would be at the bottom left square if you were to orient the cube facing you with the bottom edge
+ * at the bottom.  Square[2][2] would be at the top right for a 3x3 cube.  Keep in mind the square represents a matrix
+ * so cartesian coords will be square[y][x].
  *
  * Front:Bottom
  * Top:Front
@@ -37,11 +41,10 @@ RCube::RCube(QObject *parent) : QObject(parent)
  * Bottom:Front
  * Back:Bottom
  *
- * This information is very important.  If you don't understand why yet, you will.
- *
  * Inside of the functions there is a little helper too that goes...
  * Adjacent Face Name : Edge Of That Face That Needs To Rotate
  * Face:edge   Capstart;lowercase
+ * So, when you're doing your rotations the <edge> squares of <Face> should be the ones changing
  */
 
 void RCube::frontCCW()
@@ -50,7 +53,13 @@ void RCube::frontCCW()
 
     // Adjacents include:
     // Top:bottom; Bottom:bottom; Left:bottom; Right:bottom
-    Color adj1[CUBE_DIMENSION] ;
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Right]);  sides.append(bottom_edge);
+    rotate_faces.append(&faces[Bottom]); sides.append(bottom_edge);
+    rotate_faces.append(&faces[Left]);   sides.append(bottom_edge);
+    rotate_faces.append(&faces[Top]);    sides.append(bottom_edge);
+    rotateEdges(rotate_faces, sides);
 }
 void RCube::frontCW()
 {
@@ -58,6 +67,13 @@ void RCube::frontCW()
 
     // Adjacents include:
     // Top:bottom; Bottom:bottom; Left:bottom; Right:bottom
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Top]);    sides.append(bottom_edge);
+    rotate_faces.append(&faces[Left]);   sides.append(bottom_edge);
+    rotate_faces.append(&faces[Bottom]); sides.append(bottom_edge);
+    rotate_faces.append(&faces[Right]);  sides.append(bottom_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::backCCW()
@@ -65,6 +81,13 @@ void RCube::backCCW()
     faces[Back].rotateCCW();
     // Adjacents include:
     // Top:top; Bottom:top; Left:top; Right:top
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Top]);    sides.append(top_edge);
+    rotate_faces.append(&faces[Left]);   sides.append(top_edge);
+    rotate_faces.append(&faces[Bottom]); sides.append(top_edge);
+    rotate_faces.append(&faces[Right]);  sides.append(top_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::backCW()
@@ -72,6 +95,13 @@ void RCube::backCW()
     faces[Back].rotateCW();
     // Adjacents include:
     // Top:top; Bottom:top; Left:top; Right:top
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Right]);  sides.append(top_edge);
+    rotate_faces.append(&faces[Bottom]); sides.append(top_edge);
+    rotate_faces.append(&faces[Left]);   sides.append(top_edge);
+    rotate_faces.append(&faces[Top]);    sides.append(top_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::leftCCW()
@@ -79,6 +109,13 @@ void RCube::leftCCW()
     faces[Left].rotateCCW();
     // Adjacents include:
     // Top:left; Bottom:right; Back:right; Front:left
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Front]);   sides.append(left_edge);
+    rotate_faces.append(&faces[Bottom]);  sides.append(right_edge);
+    rotate_faces.append(&faces[Back]);    sides.append(right_edge);
+    rotate_faces.append(&faces[Top]);     sides.append(left_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::leftCW()
@@ -86,12 +123,26 @@ void RCube::leftCW()
     faces[Left].rotateCW();
     // Adjacents include:
     // Top:left; Bottom:right; Back:right; Front:left
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Top]);     sides.append(left_edge);
+    rotate_faces.append(&faces[Back]);    sides.append(right_edge);
+    rotate_faces.append(&faces[Bottom]);  sides.append(right_edge);
+    rotate_faces.append(&faces[Front]);   sides.append(left_edge);
+    rotateEdges(rotate_faces, sides);
 }
 void RCube::rightCCW()
 {
     faces[Right].rotateCCW();
     // Adjacents include:
     // Top:right; Bottom:left; Back:left; Front:right
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Top]);     sides.append(right_edge);
+    rotate_faces.append(&faces[Back]);    sides.append(left_edge);
+    rotate_faces.append(&faces[Bottom]);  sides.append(left_edge);
+    rotate_faces.append(&faces[Front]);   sides.append(right_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::rightCW()
@@ -99,6 +150,13 @@ void RCube::rightCW()
     faces[Right].rotateCW();
     // Adjacents include:
     // Top:right; Bottom:left; Back:left; Front:right
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Front]);   sides.append(right_edge);
+    rotate_faces.append(&faces[Bottom]);  sides.append(left_edge);
+    rotate_faces.append(&faces[Back]);    sides.append(left_edge);
+    rotate_faces.append(&faces[Top]);     sides.append(right_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::topCCW()
@@ -106,6 +164,13 @@ void RCube::topCCW()
     faces[Top].rotateCCW();
     // Adjacents include:
     // Left:right; Right:left; Back:top; Front:top
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Right]); sides.append(left_edge);
+    rotate_faces.append(&faces[Front]); sides.append(top_edge);
+    rotate_faces.append(&faces[Left]);  sides.append(right_edge);
+    rotate_faces.append(&faces[Back]);  sides.append(top_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::topCW()
@@ -113,6 +178,13 @@ void RCube::topCW()
     faces[Top].rotateCW();
     // Adjacents include:
     // Left:right; Right:left; Back:top; Front:top
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Back]);  sides.append(top_edge);
+    rotate_faces.append(&faces[Left]);  sides.append(right_edge);
+    rotate_faces.append(&faces[Front]); sides.append(top_edge);
+    rotate_faces.append(&faces[Right]); sides.append(left_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::bottomCCW()
@@ -120,6 +192,13 @@ void RCube::bottomCCW()
     faces[Bottom].rotateCCW();
     // Adjacents include:
     // Left:left; Right:right; Back:bottom; Front:bottom
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Back]);  sides.append(bottom_edge);
+    rotate_faces.append(&faces[Left]);  sides.append(left_edge);
+    rotate_faces.append(&faces[Front]); sides.append(bottom_edge);
+    rotate_faces.append(&faces[Right]); sides.append(right_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 void RCube::bottomCW()
@@ -127,10 +206,37 @@ void RCube::bottomCW()
     faces[Bottom].rotateCW();
     // Adjacents include:
     // Left:left; Right:right; Back:bottom; Front:bottom
+    QList<Face*> rotate_faces;
+    QList<Side> sides;
+    rotate_faces.append(&faces[Right]); sides.append(right_edge);
+    rotate_faces.append(&faces[Front]); sides.append(bottom_edge);
+    rotate_faces.append(&faces[Left]);  sides.append(left_edge);
+    rotate_faces.append(&faces[Back]);  sides.append(bottom_edge);
+    rotateEdges(rotate_faces, sides);
 }
 
 
+void RCube::rotateEdges(QList<Face*> faces, QList<Side> sides)
+{
+    // Grab the first edge and stick it in the hold
+    QList<Color> hold, pass;
+    faces[0]->getSide(hold, sides.at(0));
 
+    // Shift three sides
+    faces[1]->getSide(pass, sides.at(1));
+    faces[0]->setSide(pass, sides.at(0));
+    pass.clear();
+
+    faces[2]->getSide(pass, sides.at(2));
+    faces[1]->setSide(pass, sides.at(1));
+    pass.clear();
+
+    faces[3]->getSide(pass, sides.at(3));
+    faces[2]->setSide(pass, sides.at(2));
+
+    // Stick the hold in the last open spot
+    faces[3]->setSide(hold, sides.at(3));
+}
 
 
 
@@ -138,7 +244,51 @@ void RCube::bottomCW()
 // Face Class
 // ==========
 
+void RCube::Face::getSide(QList<Color>& list, Side side)
+{
+    switch(side)
+    {
+    case top_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            list.append( squares[CUBE_DIMENSION-1][i] );
+        return;
+    case bottom_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            list.append( squares[0][i] );
+        return;
+    case left_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            list.append( squares[i][0] );
+        return;
+    case right_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            list.append( squares[i][CUBE_DIMENSION-1] );
+        return;
+    }
+}
 
+void RCube::Face::setSide(const QList<Color>& list, Side side)
+{
+    switch(side)
+    {
+    case top_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            squares[CUBE_DIMENSION-1][i] = list.at(i);
+        return;
+    case bottom_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            squares[0][i] = list.at(i);
+        return;
+    case left_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            squares[i][0] = list.at(i);
+        return;
+    case right_edge:
+        for (int i = 0; i < CUBE_DIMENSION; i++)
+            squares[i][CUBE_DIMENSION-1] = list.at(i);
+        return;
+    }
+}
 
 // QColor getter for squares
 QColor RCube::Face::getColor(int y, int x)
@@ -186,6 +336,8 @@ RCube::Face::Face()
             this->squares[y][x] = color;
         }
     color_itt++;
+    if (color_itt > 5)
+        color_itt = 0;
 #else
     for (int x = 0; x < CUBE_DIMENSION; x++)
         for (int y = 0; y < CUBE_DIMENSION; y++)

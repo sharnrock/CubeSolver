@@ -127,3 +127,20 @@ MainWindow::~MainWindow()
     delete ui;
     delete cube;
 }
+
+void MainWindow::on_but_scramble_clicked()
+{
+
+}
+
+void MainWindow::on_but_autosolve_clicked()
+{
+
+}
+
+void MainWindow::on_but_reset_clicked()
+{
+    delete cube;
+    cube = new RCube();
+    updateCube();
+}

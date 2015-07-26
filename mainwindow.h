@@ -30,6 +30,13 @@ protected:
 public slots:
     void updateCube();
 
+private slots:
+    void on_but_scramble_clicked();
+
+    void on_but_autosolve_clicked();
+
+    void on_but_reset_clicked();
+
 private:
     QList<QLabel*> face_labels;
     QList<QPixmap*> face_pixmaps;

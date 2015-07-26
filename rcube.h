@@ -17,7 +17,15 @@ enum Color
     Yellow
 };
 
-enum
+enum Side
+{
+    top_edge = 0,
+    bottom_edge,
+    left_edge,
+    right_edge
+};
+
+enum // Face id
 {
     Front = 0,
     Back,
@@ -33,7 +41,6 @@ class RCube : public QObject
 public:
     explicit RCube(QObject *parent = 0);
 
-
     class Face
     {
         friend class RCube;
@@ -43,15 +50,17 @@ public:
         void rotateCW();
         void rotateCCW();
         QColor getColor(int y, int x);
+        void getSide(QList<Color>&, Side);
+        void setSide(const QList<Color>&, Side);
         Face();
         Face(const Face&);
         Face& operator=(const Face&);
     };
 
-
 private:
     QList<Face> faces;
     static int doubleToIntRounder(double d);
+    void rotateEdges(QList<Face*>, QList<Side>);
 
 signals:
 
@@ -72,12 +81,6 @@ public slots:
 public:
     Face getFace(int);
 
-//    Face getFrontFace() { return faces[Front]; }
-//    Face getBackFace() { return faces[Back]; }
-//    Face getLeftFace() { return faces[Left]; }
-//    Face getRightFace() { return faces[Right]; }
-//    Face getTopFace() { return faces[Top]; }
-//    Face getBottomFace() { return faces[Bottom]; }
 };
 
 #endif // RCUBE_H

@@ -6,10 +6,12 @@
 
 
 const static int FACE_SIZE = 99,
-    SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION;
+    SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION,
+    SCRAMBLE = 20;
 
 class QLabel;
 class QPixmap;
+class CubeSolver;
 
 
 namespace Ui {
@@ -32,15 +34,14 @@ public slots:
 
 private slots:
     void on_but_scramble_clicked();
-
     void on_but_autosolve_clicked();
-
     void on_but_reset_clicked();
 
 private:
     QList<QLabel*> face_labels;
     QList<QPixmap*> face_pixmaps;
     RCube *cube;
+    CubeSolver *solver;
 
 
     void fillFaces();

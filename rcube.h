@@ -32,7 +32,8 @@ enum // Face id
     Left,
     Right,
     Top,
-    Bottom
+    Bottom,
+    FaceCount
 };
 
 class RCube : public QObject
@@ -40,6 +41,8 @@ class RCube : public QObject
     Q_OBJECT
 public:
     explicit RCube(QObject *parent = 0);
+    RCube(const RCube&);
+    RCube& operator=(const RCube&);
 
     class Face
     {
@@ -47,6 +50,7 @@ public:
     private:
         Color squares[CUBE_DIMENSION][CUBE_DIMENSION];
     public:
+        bool isSolved();
         void rotateCW();
         void rotateCCW();
         QColor getColor(int y, int x);
@@ -65,6 +69,9 @@ private:
 signals:
 
 public slots:
+    void reset();
+
+    // Moves
     void frontCCW();
     void frontCW();
     void backCCW();
@@ -80,6 +87,7 @@ public slots:
 
 public:
     Face getFace(int);
+    const Face getFace(int) const;
 
 };
 

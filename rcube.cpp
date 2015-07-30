@@ -18,6 +18,26 @@ RCube::RCube(QObject *parent) : QObject(parent)
         faces.append(Face());
 }
 
+RCube::RCube(const RCube& in)
+{
+    (*this) = in;
+}
+RCube& RCube::operator=(const RCube& in)
+{
+//    // manual resize to avoid a crash
+//    for (int i = 0; i < FaceCount; i++)
+//        this->faces.append(NULL);
+
+    this->faces = in.faces;
+
+//    this->faces[Front] = in.getFace(Front);
+//    this->faces[Back] = in.getFace(Back);
+//    this->faces[Left] = in.getFace(Left);
+//    this->faces[Right] = in.getFace(Right);
+//    this->faces[Top] = in.getFace(Top);
+//    this->faces[Bottom] = in.getFace(Bottom);
+    return *this;
+}
 
 
 // ==============
@@ -240,6 +260,16 @@ void RCube::rotateEdges(QList<Face*> faces, QList<Side> sides)
 
 
 
+void RCube::reset()
+{
+    for (int i = 0; i < faces.count(); i++)
+    {
+        faces[i] = Face();
+    }
+}
+
+
+
 // ==========
 // Face Class
 // ==========
@@ -323,6 +353,11 @@ RCube::Face RCube::getFace(int face_i)
     return faces[face_i];
 }
 
+const RCube::Face RCube::getFace(int face_i) const
+{
+    return faces.at(face_i);
+}
+
 
 // Face constructor
 RCube::Face::Face()
@@ -342,7 +377,7 @@ RCube::Face::Face()
     for (int x = 0; x < CUBE_DIMENSION; x++)
         for (int y = 0; y < CUBE_DIMENSION; y++)
         {
-            int color_itt = rand() % 6;
+            int color_itt = qrand() % 6;
             Color color = static_cast<Color>(color_itt);
             this->squares[y][x] = color;
         }
@@ -351,7 +386,7 @@ RCube::Face::Face()
 
 void RCube::Face::rotateCCW()
 {
-    qDebug() << "ccw triggered";
+    //qDebug() << "ccw triggered";
     // To rotate this thing we're going to use some trig
     // First we're going to set the middle sqaure at the origin of the coordinate system
     // Calculate offset
@@ -394,9 +429,20 @@ void RCube::Face::rotateCCW()
     *this = face_result;
 }
 
+bool RCube::Face::isSolved()
+{
+    Color test = squares[0][0];
+    for (int y = 0; y < CUBE_DIMENSION; y++)
+        for (int x = 0; x < CUBE_DIMENSION; x++)
+            if (test != squares[y][x])
+                return false;
+
+    return true;
+}
+
 void RCube::Face::rotateCW()
 {
-    qDebug() << "cw triggered";
+    //qDebug() << "cw triggered";
     // To rotate this thing we're going to use some trig
     // First we're going to set the middle sqaure at the origin of the coordinate system
     // Calculate offset

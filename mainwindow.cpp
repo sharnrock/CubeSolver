@@ -1,18 +1,25 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QThread>
 #include <QPixmap>
 #include <QDebug>
 #include <QPainter>
+#include <QTime>
+#include "cubesolver.h"
 #include "rcube.h"
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     cube( new RCube() ),
+    solver(new CubeSolver(this, cube) ),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    QTime now = QTime::currentTime();
+    qsrand(now.msec());
 
     // ================================
     // Set up buttons with cube's slots
@@ -70,9 +77,9 @@ MainWindow::MainWindow(QWidget *parent) :
     fillFaces();
 }
 
-void MainWindow::mousePressEvent(QMouseEvent * event)
+void MainWindow::mousePressEvent(QMouseEvent *)
 {
-    qDebug() << "updating";
+    //qDebug() << "updating";
     updateCube();
 }
 
@@ -80,7 +87,7 @@ void MainWindow::mousePressEvent(QMouseEvent * event)
 // SLOT: The cube has moved, draw it again
 void MainWindow::updateCube()
 {
-    qDebug() << "updating";
+    //qDebug() << "updating";
     fillFaces();
 }
 
@@ -126,21 +133,70 @@ MainWindow::~MainWindow()
 {
     delete ui;
     delete cube;
+    /* this can come back when it exists
+    solver->exit();
+
+    solver->wait();
+    delete solver;
+    */
 }
 
 void MainWindow::on_but_scramble_clicked()
 {
 
+    for (int i = 0; i < SCRAMBLE; i++)
+    {
+        int move = qrand() % 12;
+        switch(move)
+        {
+        case 0:
+            ui->but_front_ccw->clicked();
+            break;
+        case 1:
+            ui->but_front_cw->clicked();
+            break;
+        case 2:
+            ui->but_back_ccw->clicked();
+            break;
+        case 3:
+            ui->but_back_cw->clicked();
+            break;
+        case 4:
+            ui->but_left_ccw->clicked();
+            break;
+        case 5:
+            ui->but_left_cw->clicked();
+            break;
+        case 6:
+            ui->but_right_ccw->clicked();
+            break;
+        case 7:
+            ui->but_right_cw->clicked();
+            break;
+        case 8:
+            ui->but_top_ccw->clicked();
+            break;
+        case 9:
+            ui->but_top_cw->clicked();
+            break;
+        case 10:
+            ui->but_bottom_ccw->clicked();
+            break;
+        case 11:
+            ui->but_bottom_cw->clicked();
+            break;
+        }
+
+    }
 }
 
 void MainWindow::on_but_autosolve_clicked()
 {
-
+    solver->start();
 }
 
 void MainWindow::on_but_reset_clicked()
 {
-    delete cube;
-    cube = new RCube();
+    cube->reset();
     updateCube();
 }

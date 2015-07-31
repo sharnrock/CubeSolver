@@ -21,6 +21,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QTime now = QTime::currentTime();
     qsrand(now.msec());
 
+    qRegisterMetaType<RCube>("RCube");
+    QObject::connect(solver, SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
+
     // ================================
     // Set up buttons with cube's slots
     // ================================
@@ -85,6 +88,13 @@ void MainWindow::mousePressEvent(QMouseEvent *)
 
 
 // SLOT: The cube has moved, draw it again
+void MainWindow::updateCube(RCube incoming)
+{
+    *cube = incoming;
+    //qDebug() << "updating";
+    fillFaces();
+}
+
 void MainWindow::updateCube()
 {
     //qDebug() << "updating";

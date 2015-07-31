@@ -440,6 +440,18 @@ bool RCube::Face::isSolved()
     return true;
 }
 
+int RCube::Face::isAlmostSolved()
+{
+    Color center = squares[1][1];
+    int matched = 0;
+    for (int y = 0; y < CUBE_DIMENSION; y++)
+        for (int x = 0; x < CUBE_DIMENSION; x++)
+            if (center == squares[y][x])
+                matched++;
+
+    return matched-1; // will always match with itself, so we just offset
+}
+
 void RCube::Face::rotateCW()
 {
     //qDebug() << "cw triggered";

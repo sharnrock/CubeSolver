@@ -51,6 +51,7 @@ public:
         Color squares[CUBE_DIMENSION][CUBE_DIMENSION];
     public:
         bool isSolved();
+        int isAlmostSolved();
         void rotateCW();
         void rotateCCW();
         QColor getColor(int y, int x);

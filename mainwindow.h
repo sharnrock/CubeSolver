@@ -7,7 +7,7 @@
 
 const static int FACE_SIZE = 99,
     SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION,
-    SCRAMBLE = 20;
+    SCRAMBLE = 2;
 
 class QLabel;
 class QPixmap;
@@ -15,7 +15,7 @@ class CubeSolver;
 
 
 namespace Ui {
-class MainWindow;
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -30,6 +30,7 @@ protected:
     void mousePressEvent(QMouseEvent * event);
 
 public slots:
+    void updateCube(RCube);
     void updateCube();
 
 private slots:

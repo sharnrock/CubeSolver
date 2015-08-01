@@ -9,6 +9,10 @@ CubeSolver::CubeSolver(MainWindow* _window, RCube* _cube) :
 
 {
     tester_cube = *live_cube;
+    moveGraph = new QImage(STARTING_MOVES,STARTING_ORGANISMS, QImage::Format_RGB16);
+    progressGraph = new QImage(50,50, QImage::Format_RGB16);
+    moveGraph->fill(Qt::black);
+    progressGraph->fill(Qt::black);
 }
 
 CubeSolver::~CubeSolver()
@@ -41,6 +45,7 @@ void CubeSolver::run()
             }
 #endif
             organisms.at(i)->solveCube(); // returns score based on largest score they achieved
+
 #if CUBE_TEST
             if (*organisms.at(i)->p_cube == tester_cube)
             {
@@ -49,7 +54,10 @@ void CubeSolver::run()
             }
 #endif
         }
+        // the two draws need to be moved around a bit
+        drawMoveGraph();
         breed();
+        drawProgressgraph();
         //qDebug() << "Generation: " << generation;
     }
     qDebug() << "stop";
@@ -63,6 +71,7 @@ void CubeSolver::genesis()
     }
 }
 
+#ifdef BREED1
 void CubeSolver::breed()
 {
     qSort(organisms.begin(), organisms.end(), CubeSolver::Organism::greaterThan );
@@ -156,6 +165,131 @@ void CubeSolver::breed()
     }
 #endif
 }
+#endif
+// end of breed1
+
+#ifdef BREED2
+void CubeSolver::breed()
+{
+    qSort(organisms.begin(), organisms.end(), CubeSolver::Organism::greaterThan );
+
+    qDebug() << "top score: " << organisms[0]->score;
+    emit sendCube(*organisms[0]->p_cube); // display the winning cube of the generation
+
+    int left = 0;
+    int right = qrand() % STARTING_MOVES;
+    int half_way = STARTING_ORGANISMS / 2;
+
+    // Selective reproduction
+    for (int i = 0; i < half_way; i++)
+    {
+        organisms[half_way+i]->moves = copyGenes(organisms[i]->moves, organisms[half_way-i]->moves, left, right);
+        // reset scores
+        organisms[i]->score = 0;
+        *organisms[i]->p_cube = *solve_cube;
+        // reset cube
+        organisms[half_way+i]->score = 0;
+        *organisms[half_way+i]->p_cube = *solve_cube;
+
+#if CUBE_TEST
+        // Cube test
+        if (*organisms[i]->p_cube != *organisms[half_way+i]->p_cube ||
+                *organisms[half_way+i]->p_cube != tester_cube)
+        {
+            qDebug() << "cubes don't match original cube";
+            throw;
+        }
+#endif
+    }
+
+    // The bottom ones, can just start from scratch
+    int movecount = static_cast<int>(CubeSolver::MoveCount);
+    for (int selected_one = STARTING_ORGANISMS - BOTTOM_CUTOFF; selected_one < STARTING_ORGANISMS; selected_one++)
+    {
+        for (int move = 0; move < STARTING_MOVES; move++)
+        {
+            organisms[selected_one]->moves[move] = static_cast<Move>( qrand() % movecount );
+        }
+    }
+
+
+#if 0
+    qSort(organisms.begin(), organisms.end(), CubeSolver::Organism::greaterThan );
+
+    qDebug() << "top score: " << organisms[0]->score;
+    emit sendCube(*organisms[0]->p_cube);
+
+    int left = qrand() % STARTING_MOVES;
+    int right = qrand() % STARTING_MOVES;
+    if (right < left)
+    {
+        int swap = left;
+        left = right;
+        right = swap;
+    }
+    if (left > right)
+        throw; //you messed up
+    if (left == right && right < STARTING_MOVES)
+        right++;
+    else if (left == right)
+        left--;
+
+    int half_way = STARTING_ORGANISMS / 2;
+    //int quarter_way = STARTING_MOVES / 4;
+
+    // Selective reproduction
+    for (int i = 0; i < half_way; i++)
+    {
+        organisms[half_way+i]->moves = copyGenes(organisms[i]->moves, organisms[half_way-i]->moves, left, right);
+        // reset scores
+        organisms[i]->score = 0;
+        *organisms[i]->p_cube = *solve_cube;
+        // reset cube
+        organisms[half_way+i]->score = 0;
+        *organisms[half_way+i]->p_cube = *solve_cube;
+    }
+#endif
+
+#if 1
+    // Random mutations
+    int mutation_increaser = MUTATION_AMOUNT;
+    for (int mutate = 0; mutate < MUTATION_SELECT_AMOUNT; mutate++, mutation_increaser++)
+    {
+        int selected_one = qrand() % half_way;
+        selected_one += half_way; // randomly select one in the bottom half
+        int nl = qrand() % STARTING_MOVES;
+        if (nl < STARTING_MOVES-mutation_increaser)
+        {
+            int nr = nl + mutation_increaser-1;  // randomly choose the start of the sequence, then go for mutation_amount until done
+            for (int i = nl; i < nr; i++)
+            {
+                organisms[selected_one]->moves[i] = static_cast<Move>( qrand() % movecount );
+            }
+        }
+    }
+#endif
+}
+#endif
+// end if breed 2
+
+void CubeSolver::drawMoveGraph()
+{
+    const static int r_mult = 255 / MoveCount -3; // max red byte value / the moves available - safety from going over 255
+
+    for (int y = 0; y < organisms.length(); y++)
+        for (int x = 0; x < STARTING_MOVES; x++)
+                moveGraph->setPixel(x,y, qRgb( organisms.at(y)->moves.at(x) * r_mult, 90, 90 ));
+
+
+    emit sendMoveGraph(*moveGraph);
+}
+
+void CubeSolver::drawProgressgraph()
+{
+    emit sendProgressGraph(*progressGraph); // change back to progressGraph
+}
+
+
 
 QList<CubeSolver::Move> CubeSolver::copyGenes(const QList<CubeSolver::Move>& one, const QList<CubeSolver::Move>& two, int left, int right)
 {
@@ -227,11 +361,16 @@ int CubeSolver::Organism::solveCube()
     int SOLVED_SCORE = FACE_COUNT*SCORE_FACE_COMPLETED;
     int moved = 0;
     int largest_score = 0;
+    int pos_of_large_score = 0;
     for (; moved < moves.length(); moved++)
     {
         int score = this->compute_score();
         this->move( moves.at(moved) );
-        if (score > largest_score) largest_score = score;
+        if (score > largest_score)
+        {
+            largest_score = score;
+            pos_of_large_score = moved;
+        }
         if (score >= SOLVED_SCORE)
         {
             qDebug() << "Solved! at move: " << moved;
@@ -240,6 +379,8 @@ int CubeSolver::Organism::solveCube()
     }
     if (moved < STARTING_MOVES)
         largest_score = largest_score * (STARTING_MOVES - moved) * SCORE_SOLVE_MULTIPLIER;
+    else
+        largest_score = largest_score + (STARTING_MOVES - pos_of_large_score);
     this->score = largest_score;
     return largest_score;
 }

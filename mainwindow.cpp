@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QThread>
 #include <QPixmap>
+#include <QImage>
 #include <QDebug>
 #include <QPainter>
 #include <QTime>
@@ -25,9 +26,12 @@ MainWindow::MainWindow(QWidget *parent) :
     //QObject::connect(solver, SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
 
 
+
     for (int i = 0; i < SOLVERS; i++)
     {
         solvers[i] = new CubeSolver(this, cube);
+        QObject::connect(solvers[i], SIGNAL(sendMoveGraph(QImage)), this, SLOT(updateMoveGraph(QImage)));
+        QObject::connect(solvers[i], SIGNAL(sendProgressGraph(QImage)), this, SLOT(updateProgressGraph(QImage)));
         QObject::connect(solvers[i], SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
     }
 
@@ -95,6 +99,19 @@ void MainWindow::mousePressEvent(QMouseEvent *)
     updateCube();
 }
 
+void MainWindow::updateMoveGraph(QImage in)
+{
+    static QPixmap moves;
+    moves = QPixmap::fromImage(in);
+    ui->MoveGraph->setPixmap(moves.scaled(MOVE_GRAPH_WIDTH, moves.height()));
+}
+
+void MainWindow::updateProgressGraph(QImage in)
+{
+    static QPixmap prog;
+    prog = QPixmap::fromImage(in);
+    ui->ProgressGraph->setPixmap(prog);
+}
 
 // SLOT: The cube has moved, draw it again
 void MainWindow::updateCube(RCube incoming)

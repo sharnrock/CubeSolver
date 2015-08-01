@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>602</width>
-    <height>532</height>
+    <width>730</width>
+    <height>531</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,83 @@
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>Top</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Right</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="left">
+      <property name="text">
+       <string>pix</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="1">
+     <widget class="QPushButton" name="but_autosolve">
+      <property name="text">
+       <string>Auto solver go!</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="2">
+     <widget class="QPushButton" name="but_bottom_cw">
+      <property name="text">
+       <string>Bottom CW</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="QPushButton" name="but_left_cw">
+      <property name="text">
+       <string>Left CW</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QPushButton" name="but_front_cw">
+      <property name="text">
+       <string>Front CW</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="2">
+     <widget class="QPushButton" name="but_reset">
+      <property name="text">
+       <string>Reset</string>
+      </property>
+     </widget>
+    </item>
+    <item row="8" column="0">
+     <widget class="QPushButton" name="but_scramble">
+      <property name="text">
+       <string>Scramble</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QPushButton" name="but_right_cw">
+      <property name="text">
+       <string>Right CW</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_6">
+      <property name="text">
+       <string>Bottom</string>
+      </property>
+     </widget>
+    </item>
     <item row="4" column="1">
      <widget class="QPushButton" name="but_back_cw">
       <property name="text">
@@ -106,34 +183,6 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="2">
-     <widget class="QLabel" name="left">
-      <property name="text">
-       <string>pix</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>Right</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string>Top</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="2">
-     <widget class="QLabel" name="label_6">
-      <property name="text">
-       <string>Bottom</string>
-      </property>
-     </widget>
-    </item>
     <item row="3" column="0">
      <widget class="QLabel" name="right">
       <property name="text">
@@ -155,52 +204,24 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="2">
-     <widget class="QPushButton" name="but_left_cw">
+    <item row="9" column="0">
+     <widget class="QLabel" name="MoveGraph">
       <property name="text">
-       <string>Left CW</string>
+       <string>Moves represented by color</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="0">
-     <widget class="QPushButton" name="but_front_cw">
+    <item row="9" column="1">
+     <widget class="QLabel" name="ProgressGraph">
       <property name="text">
-       <string>Front CW</string>
+       <string>Progress Graph</string>
       </property>
      </widget>
     </item>
-    <item row="6" column="2">
-     <widget class="QPushButton" name="but_bottom_cw">
+    <item row="9" column="2">
+     <widget class="QLabel" name="ExtraGraph">
       <property name="text">
-       <string>Bottom CW</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QPushButton" name="but_right_cw">
-      <property name="text">
-       <string>Right CW</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="0">
-     <widget class="QPushButton" name="but_scramble">
-      <property name="text">
-       <string>Scramble</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="1">
-     <widget class="QPushButton" name="but_autosolve">
-      <property name="text">
-       <string>Auto solver go!</string>
-      </property>
-     </widget>
-    </item>
-    <item row="8" column="2">
-     <widget class="QPushButton" name="but_reset">
-      <property name="text">
-       <string>Reset</string>
+       <string>Extry</string>
       </property>
      </widget>
     </item>
@@ -211,7 +232,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>602</width>
+     <width>730</width>
      <height>21</height>
     </rect>
    </property>

@@ -8,10 +8,12 @@
 const static int FACE_SIZE = 99,
     SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION,
     SCRAMBLE = 80,
-    SOLVERS = 4;
+    SOLVERS = 4,  // Each solver will run on its own thread
+    MOVE_GRAPH_WIDTH = 400;
 
 class QLabel;
 class QPixmap;
+class QImage;
 class CubeSolver;
 
 
@@ -33,6 +35,8 @@ protected:
 public slots:
     void updateCube(RCube);
     void updateCube();
+    void updateMoveGraph(QImage);
+    void updateProgressGraph(QImage);
 
 private slots:
     void on_but_scramble_clicked();

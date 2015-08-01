@@ -4,12 +4,17 @@
 #include <QObject>
 #include <QThread>
 #include <QList>
+#include <QImage>
 #include <QReadWriteLock>
 
 #include "rcube.h"
 //class RCube;
 
 #define CUBE_TEST 0
+
+// Quickly choose breeding algorithm
+//#define BREED1
+#define BREED2
 
 class MainWindow;
 
@@ -23,8 +28,8 @@ public:
 
 
     // Constants
-    const static int STARTING_MOVES = 60; // this many random moves are created and used before giving up
-    const static int STARTING_ORGANISMS = 400;
+    const static int STARTING_MOVES = 40; // this many random moves are created and used before giving up
+    const static int STARTING_ORGANISMS = 200;
     const static int GEN_RUNS = 10000; // generation runs; how many generations before the program quits
 
     // SCORE CONSTANTS
@@ -36,8 +41,9 @@ public:
 
 
     // Replace this amount of moves per mutation;
-    const static int MUTATION_AMOUNT = STARTING_MOVES / 8; // How many moves in a sequence will mutate
-    const static int MUTATION_SELECT_AMOUNT = STARTING_ORGANISMS / 2.5; // How many organisms will mutate out of the total amount
+    const static int MUTATION_AMOUNT = 3; // How many moves in a sequence will mutate
+    const static int MUTATION_SELECT_AMOUNT = STARTING_ORGANISMS / 2; // How many organisms will mutate out of the total amount
+    const static int BOTTOM_CUTOFF = 10; // Take the last N of the list and just start over
 
     // Some defined enums
     enum Move
@@ -62,6 +68,8 @@ public:
 
 signals:
     void sendCube(RCube);
+    void sendMoveGraph(QImage);
+    void sendProgressGraph(QImage);
 public slots:
     // incoming from window?
 protected:
@@ -74,7 +82,11 @@ private:
     QReadWriteLock lock;
 
     QList<Organism*> organisms;
+    QImage *moveGraph;
+    QImage *progressGraph;
 
+    void drawMoveGraph();
+    void drawProgressgraph();
     void genesis();
     void breed();
     QList<Move> copyGenes(const QList<Move>& one, const QList<Move>& two, int left, int right);

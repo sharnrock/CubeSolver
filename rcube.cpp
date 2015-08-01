@@ -40,6 +40,25 @@ RCube& RCube::operator=(const RCube& in)
 }
 
 
+bool RCube::operator==(const RCube& in)
+{
+    for (int face = 0; face < FACE_COUNT; face++)
+    {
+        Face lf = this->getFace(face);
+        Face rf = in.getFace(face);
+        if (lf != rf)
+            return false;
+    }
+    return true;
+}
+
+bool RCube::operator!=(const RCube& in)
+{
+    return !((*this)==in);
+}
+
+
+
 // ==============
 // Cube Movements
 // ==============
@@ -527,4 +546,18 @@ RCube::Face& RCube::Face::operator=(const RCube::Face& face)
     return *this;
 }
 
+// More overloads
+bool RCube::Face::operator!=(const RCube::Face& in)
+{
+    return !(*this == in);
+}
 
+bool RCube::Face::operator==(const RCube::Face& in)
+{
+    for (int y = 0; y < CUBE_DIMENSION; y++)
+        for (int x = 0; x < CUBE_DIMENSION; x++)
+            if (this->squares[y][x] != in.squares[y][x])
+                return false;
+
+    return true;
+}

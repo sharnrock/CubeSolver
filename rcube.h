@@ -43,6 +43,8 @@ public:
     explicit RCube(QObject *parent = 0);
     RCube(const RCube&);
     RCube& operator=(const RCube&);
+    bool operator!=(const RCube&);
+    bool operator==(const RCube&);
 
     class Face
     {
@@ -60,6 +62,8 @@ public:
         Face();
         Face(const Face&);
         Face& operator=(const Face&);
+        bool operator!=(const Face&);
+        bool operator==(const Face&);
     };
 
 private:

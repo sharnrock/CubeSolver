@@ -13,7 +13,7 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     cube( new RCube() ),
-    solver(new CubeSolver(this, cube) ),
+    //solver(new CubeSolver(this, cube) ),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -22,10 +22,19 @@ MainWindow::MainWindow(QWidget *parent) :
     qsrand(now.msec());
 
     qRegisterMetaType<RCube>("RCube");
-    QObject::connect(solver, SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
+    //QObject::connect(solver, SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
+
+
+    for (int i = 0; i < SOLVERS; i++)
+    {
+        solvers[i] = new CubeSolver(this, cube);
+        QObject::connect(solvers[i], SIGNAL(sendCube(RCube)), this, SLOT(updateCube(RCube)));
+    }
+
+
 
     // ================================
-    // Set up buttons with cube's slots
+    // Set up ui buttons with cube's slots
     // ================================
     // front
     QObject::connect(ui->but_front_ccw, SIGNAL( clicked() ), cube, SLOT( frontCCW() ));
@@ -202,7 +211,11 @@ void MainWindow::on_but_scramble_clicked()
 
 void MainWindow::on_but_autosolve_clicked()
 {
-    solver->start();
+    //solver->start();
+    for (int i = 0; i < SOLVERS; i++)
+    {
+        solvers[i]->start();
+    }
 }
 
 void MainWindow::on_but_reset_clicked()

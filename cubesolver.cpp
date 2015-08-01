@@ -4,9 +4,11 @@
 
 CubeSolver::CubeSolver(MainWindow* _window, RCube* _cube) :
     main_window(_window),
-    cube(new RCube(*_cube))
-{
+    //solve_cube(new RCube(_cube)),
+    live_cube(_cube)
 
+{
+    tester_cube = *live_cube;
 }
 
 CubeSolver::~CubeSolver()
@@ -17,16 +19,38 @@ CubeSolver::~CubeSolver()
 
 void CubeSolver::run()
 {
+    // Create a new instance of a cube, so we can hold on to whatever scramble comes in
+
+    lock.lockForRead();
+    solve_cube = new RCube(*live_cube);
+    tester_cube = *live_cube;
+    lock.unlock();
+
+    // Create the first of the random moves
     genesis();
 
     for (int generation = 0; generation < GEN_RUNS; generation++)
     {
         for (int i = 0; i < organisms.length(); i++)
         {
+#if CUBE_TEST
+            if (*organisms.at(i)->p_cube != tester_cube)
+            {
+                qDebug() << "Cube was not equal to tester before solving";
+                throw;
+            }
+#endif
             organisms.at(i)->solveCube(); // returns score based on largest score they achieved
+#if CUBE_TEST
+            if (*organisms.at(i)->p_cube == tester_cube)
+            {
+                qDebug() << "Cube was equal to tester before solving";
+                throw;
+            }
+#endif
         }
         breed();
-        qDebug() << "Generation: " << generation;
+        //qDebug() << "Generation: " << generation;
     }
     qDebug() << "stop";
 }
@@ -35,12 +59,48 @@ void CubeSolver::genesis()
 {
     for (int i = 0; i < STARTING_ORGANISMS; i++)
     {
-        organisms.append( new Organism(cube) );
+        organisms.append( new Organism(solve_cube) );
     }
 }
 
 void CubeSolver::breed()
 {
+    qSort(organisms.begin(), organisms.end(), CubeSolver::Organism::greaterThan );
+
+    qDebug() << "top score: " << organisms[0]->score;
+    emit sendCube(*organisms[0]->p_cube); // display the winning cube of the generation
+
+    int left = 0;
+    int right = qrand() % STARTING_MOVES;
+    int half_way = STARTING_ORGANISMS / 2;
+
+    // Selective reproduction
+    for (int i = 0; i < half_way; i++)
+    {
+        organisms[half_way+i]->moves = copyGenes(organisms[i]->moves, organisms[half_way-i]->moves, left, right);
+        // reset scores
+        organisms[i]->score = 0;
+        *organisms[i]->p_cube = *solve_cube;
+        // reset cube
+        organisms[half_way+i]->score = 0;
+        *organisms[half_way+i]->p_cube = *solve_cube;
+
+
+#if CUBE_TEST
+        // Cube test
+        if (*organisms[i]->p_cube != *organisms[half_way+i]->p_cube ||
+                *organisms[half_way+i]->p_cube != tester_cube)
+        {
+            qDebug() << "cubes don't match original cube";
+            throw;
+        }
+#endif
+
+    }
+
+
+
+#if 0
     qSort(organisms.begin(), organisms.end(), CubeSolver::Organism::greaterThan );
 
     qDebug() << "top score: " << organisms[0]->score;
@@ -70,24 +130,28 @@ void CubeSolver::breed()
         organisms[half_way+i]->moves = copyGenes(organisms[i]->moves, organisms[half_way-i]->moves, left, right);
         // reset scores
         organisms[i]->score = 0;
-        *organisms[i]->p_cube = *cube;
+        *organisms[i]->p_cube = *solve_cube;
         // reset cube
         organisms[half_way+i]->score = 0;
-        *organisms[half_way+i]->p_cube = *cube;
+        *organisms[half_way+i]->p_cube = *solve_cube;
     }
+#endif
 
-#if 0
+#if 1
     // Random mutations
-    int selected_one = qrand() % half_way;
-    selected_one += half_way; // randomly select one in the bottom half
-    int movecount = static_cast<int>(CubeSolver::MoveCount);
-    int nl = qrand() % STARTING_MOVES;
-    if (nl < STARTING_MOVES-MUTATION_AMOUNT)
+    for (int mutate = 0; mutate < MUTATION_SELECT_AMOUNT; mutate++)
     {
-        int nr = nl + MUTATION_AMOUNT-1;  // randomly choose the start of the sequence, then go for mutation_amount until done
-        for (int i = nl; i < nr; i++)
+        int selected_one = qrand() % half_way;
+        selected_one += half_way; // randomly select one in the bottom half
+        int movecount = static_cast<int>(CubeSolver::MoveCount);
+        int nl = qrand() % STARTING_MOVES;
+        if (nl < STARTING_MOVES-MUTATION_AMOUNT)
         {
-            organisms[selected_one]->moves[i] = static_cast<Move>( qrand() % movecount );
+            int nr = nl + MUTATION_AMOUNT-1;  // randomly choose the start of the sequence, then go for mutation_amount until done
+            for (int i = nl; i < nr; i++)
+            {
+                organisms[selected_one]->moves[i] = static_cast<Move>( qrand() % movecount );
+            }
         }
     }
 #endif
@@ -115,9 +179,9 @@ QList<CubeSolver::Move> CubeSolver::copyGenes(const QList<CubeSolver::Move>& one
 //}
 
 
-CubeSolver::Organism::Organism(RCube* cube) :
+CubeSolver::Organism::Organism(RCube* solve_cube) :
     score(0),
-    p_cube(new RCube(*cube)) // make a new instance based off the original scrambled cube
+    p_cube(new RCube(*solve_cube)) // make a new instance based off the original scrambled cube
 {
     // Generate random list of moves
     for (int i = 0; i < STARTING_MOVES; i++)
@@ -165,14 +229,17 @@ int CubeSolver::Organism::solveCube()
     int largest_score = 0;
     for (; moved < moves.length(); moved++)
     {
-        this->move( moves.at(moved) );
         int score = this->compute_score();
+        this->move( moves.at(moved) );
         if (score > largest_score) largest_score = score;
         if (score >= SOLVED_SCORE)
+        {
+            qDebug() << "Solved! at move: " << moved;
             break;
+        }
     }
     if (moved < STARTING_MOVES)
-        largest_score *= (STARTING_MOVES - moved) * SCORE_SOLVE_MULTIPLIER;
+        largest_score = largest_score * (STARTING_MOVES - moved) * SCORE_SOLVE_MULTIPLIER;
     this->score = largest_score;
     return largest_score;
 }
@@ -227,7 +294,10 @@ int CubeSolver::Organism::compute_score()
     {
         int matched_colors = p_cube->getFace(i).isAlmostSolved();
         if (matched_colors == CUBE_DIMENSION*CUBE_DIMENSION-1)
+        {
+            //qDebug() << "One face completed";
             total_score += SCORE_FACE_COMPLETED;
+        }
         else
             total_score += matched_colors;
     }

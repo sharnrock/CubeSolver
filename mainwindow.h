@@ -7,7 +7,8 @@
 
 const static int FACE_SIZE = 99,
     SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION,
-    SCRAMBLE = 2;
+    SCRAMBLE = 80,
+    SOLVERS = 4;
 
 class QLabel;
 class QPixmap;
@@ -42,8 +43,8 @@ private:
     QList<QLabel*> face_labels;
     QList<QPixmap*> face_pixmaps;
     RCube *cube;
-    CubeSolver *solver;
-
+    //CubeSolver *solver;
+    CubeSolver* solvers[SOLVERS];
 
     void fillFaces();
     void fillFace(int);

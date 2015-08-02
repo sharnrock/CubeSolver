@@ -8,16 +8,10 @@
 #include <QReadWriteLock>
 
 #include "rcube.h"
-//class RCube;
 
-#define CUBE_TEST 0
 
-// Quickly choose breeding algorithm
-//#define BREED1
-#define BREED2
 
 class MainWindow;
-
 class CubeSolver : public QThread
 {
     Q_OBJECT
@@ -26,11 +20,26 @@ public:
     explicit CubeSolver(MainWindow*, RCube*);
     ~CubeSolver();
 
+// ==============================
+// SETTINGS!
+// ==============================
+
+// Quickly choose breeding algorithm
+//#define BREED1
+#define BREED2
+#define CUBE_TEST 0
 
     // Constants
-    const static int STARTING_MOVES = 40; // this many random moves are created and used before giving up
+    const static int STARTING_MOVES = 20; // this many random moves are created and used before giving up
     const static int STARTING_ORGANISMS = 200;
-    const static int GEN_RUNS = 10000; // generation runs; how many generations before the program quits
+    const static int GEN_RUNS = 80000; // generation runs; how many generations before the program quits
+
+    // Replace this amount of moves per mutation;
+    const static int MUTATION_AMOUNT = 2; // How many moves in a sequence will mutate
+    const static int MUTATION_SELECT_AMOUNT = STARTING_ORGANISMS / 2; // How many organisms will mutate out of the total amount
+    const static int BOTTOM_CUTOFF = 10; // Take the last N of the list and just start over with brand new random
+
+
 
     // SCORE CONSTANTS
     // If any of the squares match the color of the center square that is worth 1 point per square (total of 8 points [because -1 for center square])
@@ -40,10 +49,6 @@ public:
     const static int SCORE_SOLVE_MULTIPLIER = 100; // moves_left*this# * face_completed_score  total maximum score of around 3Million or something...
 
 
-    // Replace this amount of moves per mutation;
-    const static int MUTATION_AMOUNT = 3; // How many moves in a sequence will mutate
-    const static int MUTATION_SELECT_AMOUNT = STARTING_ORGANISMS / 2; // How many organisms will mutate out of the total amount
-    const static int BOTTOM_CUTOFF = 10; // Take the last N of the list and just start over
 
     // Some defined enums
     enum Move

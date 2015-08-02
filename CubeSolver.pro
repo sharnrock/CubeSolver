@@ -15,12 +15,10 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     rcube.cpp \
-    cubesolver.cpp \
-    lamesolver.cpp
+    cubesolver.cpp
 
 HEADERS  += mainwindow.h \
     rcube.h \
-    cubesolver.h \
-    lamesolver.h
+    cubesolver.h
 
 FORMS    += mainwindow.ui

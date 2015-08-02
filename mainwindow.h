@@ -7,7 +7,7 @@
 
 const static int FACE_SIZE = 99,
     SQUARE_SIZE = FACE_SIZE / CUBE_DIMENSION,
-    SCRAMBLE = 80,
+    SCRAMBLE = 18,
     SOLVERS = 4,  // Each solver will run on its own thread
     MOVE_GRAPH_WIDTH = 400;
 
@@ -15,6 +15,7 @@ class QLabel;
 class QPixmap;
 class QImage;
 class CubeSolver;
+
 
 
 namespace Ui {
@@ -47,8 +48,8 @@ private:
     QList<QLabel*> face_labels;
     QList<QPixmap*> face_pixmaps;
     RCube *cube;
-    //CubeSolver *solver;
     CubeSolver* solvers[SOLVERS];
+
 
     void fillFaces();
     void fillFace(int);
